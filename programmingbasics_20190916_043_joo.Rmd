@@ -175,6 +175,7 @@ s_n
 
 10. Repeat exercise 8, but this time use `map_dbl`.
 ```{r}
+library(purrr)
 s_n <- map_dbl(n, compute_s_n)
 s_n
 ```
