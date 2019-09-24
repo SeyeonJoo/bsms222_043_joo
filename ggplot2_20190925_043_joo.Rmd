@@ -62,7 +62,7 @@ data(murders)
 ```
 
 
-# `ggplot` objects
+# 8.2 `ggplot` objects
 
 
 The first step in creating a **ggplot2** graph is to define a `ggplot` object. We do this with the function `ggplot`, which initializes the graph. If we read the help file for this function, we see that the first argument is used to specify what data is associated with this object:
