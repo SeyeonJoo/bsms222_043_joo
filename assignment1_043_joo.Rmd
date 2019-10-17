@@ -1,0 +1,126 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+
+
+# DDG2P: The relation between the number of phenotypes and DDD categories of mutation consequences
+
+
+## 1. Load DDG2P dataset
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+
+DDG2P_hpo <- read.table("table.hpo_obo_20190924.txt", sep='\t', header = T)
+DDG2P_pLI <- read.delim("DDG2P_24_9_2019.with_pLI.txt")
+```
+
+
+## 2. Visualization
+
+
+```{r}
+head(DDG2P_pLI)
+```
+
+
+I separated the phenotypes in each disease and changed its form into an easier form for calculation.
+```{r}
+ddg2p <- DDG2P_pLI %>%
+  separate_rows(phenotypes, sep = ';') %>%
+  na.omit()
+ddg2p
+
+nphenotypes <- as.numeric(as.factor(gsub("HP:0", "", ddg2p$phenotypes)))
+nphenotypes
+
+ddg2p <- mutate(ddg2p, phenotypes = nphenotypes)
+```
+
+
+I selected 3 columns out of the whole data to make it easier for me to analyze.
+```{r}
+ddg2p %>%
+  select('DDD.category', 'mutation.consequence', 'phenotypes')
+```
+
+
+I used the function `group_by` to group the table into `DDD.category` and `mutation.consequence`. Then I counted the number of phenotypes for the grouped form. 
+```{r}
+ddg2p %>%
+  select('DDD.category', 'mutation.consequence', 'phenotypes') %>%
+  group_by(DDD.category, mutation.consequence) %>%
+  count(name = 'no.phenotype')
+```
+
+
+I assigned the table to `b` so that I could turn it into a plot.
+```{r}
+b <- ddg2p %>%
+  select('DDD.category', 'mutation.consequence', 'phenotypes') %>%
+  group_by(DDD.category, mutation.consequence) %>%
+  count(name = 'no.phenotype')
+b
+```
+
+
+Here is the plot.
+```{r}
+b %>% ggplot(aes(DDD.category, no.phenotype)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(mutation.consequence~.) +
+  labs(title = 'Number of Phenotypes by DDD category and Mutation Consequence' , x = 'DDD category', y = 'Number of Phenotypes')
+```
+
+
+### 2.1 Mutation Consequences
+
+
+1. Loss of Function
+Nonsense, frame-shifting indel, essential splice site mutation, whole gene deletion or any other mutation where functional analysis demonstrates clear reduction or loss of function
+
+2. All missense/in frame
+Where all the mutations described in the data source are either missense or in frame deletions and there is no evidence favoring either loss-of-function, activating or dominant negative effect
+
+3. Dominant negative
+Mutation within one allele of a gene that creates a significantly greater deleterious effect on gene product function than a monoallelic loss of function mutation
+
+4. Activating
+Mutation, usually missense that results in a constituative functional activation of the gene product
+
+5. Increased gene dosage
+Copy number variation that increases the functional dosage of the gene
+
+6. Cis-regulatory or promotor mutation
+Mutation in cis-regulatory elements that lies outwith the known transcription unit and promotor of the controlled gene
+
+7. Uncertain
+Where the exact nature of the mutation is unclear or not recorded
+
+
+## 3. Conclusion
+
+
+ I wanted to find out if the number of phenotypes for each disease were related to DDD categories of mutation consequences.
+ From the plot I made, I found that the highest number of phenotypes were found in the *confirmed* DDD category of *loss of function* mutation consequences. Also, number of phenotypes were barely shown in gain of function, increased gene dosage.
+
+
+
+
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
