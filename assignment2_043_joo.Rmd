@@ -93,7 +93,7 @@ b %>% ggplot(aes(DDD.category, no.phenotype, fill = DDD.category, label = no.phe
 - To make an improvement on the opinion that the plot looks too simple in black and white, I  have used the `fill = ` function to present different colors for each DDD category.
 
 
-plot 2
+plot 2 
 ```{r}
 b %>% ggplot(aes(DDD.category, no.phenotype, fill = mutation.consequence, label = no.phenotype)) +
   geom_bar(stat = "identity") +
