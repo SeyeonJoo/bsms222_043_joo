@@ -88,9 +88,9 @@ b %>% ggplot(aes(DDD.category, no.phenotype, fill = DDD.category, label = no.phe
   labs(title = 'Number of Phenotypes by DDD category and Mutation Consequence' , x = 'DDD category', y = 'Number of Phenotypes')
 ```
 
-# I have added the labels to each values to make sure the small values could still be shown it was there.
-# It was still difficult to precisely identify all values just by using `geom_text`. So I have replaced it with `geom_label_repel` in order for it to be distinguished easily.
-# To make an improvement on the opinion that the plot looks too simple in black and white, I  have used the `fill = ` function to present different colors for each DDD category.
+- I have added the labels to each values to make sure the small values could still be shown it was there.
+- It was still difficult to precisely identify all values just by using `geom_text`. So I have replaced it with `geom_label_repel` in order for it to be distinguished easily.
+- To make an improvement on the opinion that the plot looks too simple in black and white, I  have used the `fill = ` function to present different colors for each DDD category.
 
 
 plot 2
@@ -104,9 +104,9 @@ b %>% ggplot(aes(DDD.category, no.phenotype, fill = mutation.consequence, label 
   labs(title = 'Number of Phenotypes by DDD category and Mutation Consequence' , x = 'DDD category', y = 'Number of Phenotypes')
 ```
 
-# One opinion said that it wasn't nessesary to use `facet_wrap` for the plot. So I have changed the plot form into a barplot that is stacked with mutation consequences and sorted into DDD categories.
-# The values for this plot were also very close to each other so I have used `geom_label_repel` to label numbers for each values.
-# The legend was initially on the right side of the plot but I moved it to the bottom of the plot so that there were more space for the plot.
+- One opinion said that it wasn't nessesary to use `facet_wrap` for the plot. So I have changed the plot form into a barplot that is stacked with mutation consequences and sorted into DDD categories.
+- The values for this plot were also very close to each other so I have used `geom_label_repel` to label numbers for each values.
+- The legend was initially on the right side of the plot but I moved it to the bottom of the plot so that there were more space for the plot.
 
 
 
