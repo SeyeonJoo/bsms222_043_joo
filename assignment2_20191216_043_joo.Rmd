@@ -1,0 +1,112 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+# DDG2P: The relation between the number of phenotypes and DDD categories of mutation consequences
+
+
+## 1. Load DDG2P dataset
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(ggrepel)
+
+DDG2P_hpo <- read.table("table.hpo_obo_20190924.txt", sep='\t', header = T)
+DDG2P_pLI <- read.delim("DDG2P_24_9_2019.with_pLI.txt")
+```
+
+
+## 2. Visualization
+
+
+I separated the phenotypes in each disease and changed its form into an easier form for calculation.
+```{r}
+ddg2p <- DDG2P_pLI %>%
+  separate_rows(phenotypes, sep = ';') %>%
+  na.omit()
+ddg2p
+
+nphenotypes <- as.numeric(as.factor(gsub("HP:0", "", ddg2p$phenotypes)))
+nphenotypes
+
+ddg2p <- mutate(ddg2p, phenotypes = nphenotypes)
+```
+
+
+Then, I selected 3 columns out of the whole data to make it easier for me to analyze.
+```{r}
+ddg2p %>%
+  select('DDD.category', 'mutation.consequence', 'phenotypes')
+```
+
+
+I used the function `group_by` to group the table into `DDD.category` and `mutation.consequence`. Then I counted the number of phenotypes for the grouped form.
+```{r}
+ddg2p %>%
+  select('DDD.category', 'mutation.consequence', 'phenotypes') %>%
+  group_by(DDD.category, mutation.consequence) %>%
+  count(name = 'no.phenotype')
+```
+
+
+I assigned the table to `b`.
+```{r}
+b <- ddg2p %>%
+  select('DDD.category', 'mutation.consequence', 'phenotypes') %>%
+  group_by(DDD.category, mutation.consequence) %>%
+  count(name = 'no.phenotype')
+b
+```
+
+
+```{r}
+b %>% ggplot(aes(DDD.category, no.phenotype)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(mutation.consequence~.) +
+  labs(title = 'Number of Phenotypes by DDD category and Mutation Consequence' , x = 'DDD category', y = 'Number of Phenotypes')
+```
+
+
+## 3. Modification
+
+
+plot 1
+```{r}
+b %>% ggplot(aes(DDD.category, no.phenotype, fill = DDD.category, label = no.phenotype)) +
+  geom_bar(stat = "identity") +
+  geom_label_repel(size = 1.5) +
+  scale_fill_discrete(name = 'DDD category') +
+  coord_flip() +
+  facet_wrap(mutation.consequence~.) +
+  labs(title = 'Number of Phenotypes by DDD category and Mutation Consequence' , x = 'DDD category', y = 'Number of Phenotypes')
+```
+
+- I have added the labels to each values to make sure the small values could still be shown it was there.
+- It was still difficult to precisely identify all values just by using `geom_text`. So I have replaced it with `geom_label_repel` in order for it to be distinguished easily.
+- To make an improvement on the opinion that the plot looks too simple in black and white, I  have used the `fill = ` function to present different colors for each DDD category.
+
+
+plot 2
+```{r}
+b %>% ggplot(aes(DDD.category, no.phenotype, fill = mutation.consequence, label = no.phenotype)) +
+  geom_bar(stat = "identity") +
+  theme(legend.key.width = unit(0.5, 'cm'), legend.position = 'bottom', legend.text = element_text(size=5), legend.title = element_text(size=7))+
+  geom_label_repel(size = 2) +
+  scale_fill_discrete(name = 'Mutation Consequence') +
+  coord_flip() +
+  labs(title = 'Number of Phenotypes by DDD category and Mutation Consequence' , x = 'DDD category', y = 'Number of Phenotypes')
+```
+
+- One opinion said that it wasn't nessesary to use `facet_wrap` for the plot. So I have changed the plot form into a barplot that is stacked with mutation consequences and sorted into DDD categories.
+- The values for this plot were also very close to each other so I have used `geom_label_repel` to label numbers for each values.
+- The legend was initially on the right side of the plot but I moved it to the bottom of the plot so that there were more space for the plot.
+
+
+
